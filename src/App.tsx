@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { FaCheckCircle } from 'react-icons/fa'
 import { FaTimesCircle } from 'react-icons/fa'
 // import { Task } from "./types";
@@ -9,7 +9,11 @@ interface Task {
 }
 
 function App() {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<Task[]>(() => {
+    const savedTasks = localStorage.getItem('tasks');
+    return savedTasks ? JSON.parse(savedTasks) : [];
+  });
+
   const [newTask, setNewTask] = useState('');
 
   const addTask = (): void => {
@@ -17,6 +21,8 @@ function App() {
       alert('Cannot add task greater than 32 characters.')
       return
     }
+
+
 
 
     if (newTask.trim() !== '') {
@@ -42,6 +48,11 @@ function App() {
     setTasks(tasks.filter((task, taskIndex) => taskIndex !== index))
   }
 
+  // Update localStorage when tasks state changes
+  useEffect(() => {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+  }, [tasks]);
+
 
   return (
     <>
@@ -64,7 +75,7 @@ function App() {
                 <>
                   <li
                     key={index}
-                    className={`cursor-pointer ${task.completed ? 'line-through text-green-300 bg-green-600' : ''}
+                    className={`cursor-pointer ${task.completed ? 'line-through text-green-300 bg-green-800' : ''}
                     flex justify-between bg-slate-100 my-2 p-3 rounded-lg`}
                     >
                     {task.content}
